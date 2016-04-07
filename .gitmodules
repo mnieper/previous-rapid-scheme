@@ -1,0 +1,9 @@
+[submodule "rapid-lib"]
+	path = rapid-lib
+	url = https://github.com/mnieper/rapid-lib.git
+[submodule "rapid-read"]
+	path = rapid-read
+	url = https://github.com/mnieper/rapid-read.git
+[submodule "rapid-expansion"]
+	path = rapid-expansion
+	url = https://github.com/mnieper/rapid-expansion.git

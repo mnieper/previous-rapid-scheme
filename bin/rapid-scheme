@@ -1,0 +1,7 @@
+#!/bin/sh
+
+SCHEME="chibi-scheme"
+BASEDIR=$(dirname $0)/..
+LIBRARY_PATHS="-I$BASEDIR/rapid-lib -I$BASEDIR/rapid-read -I$BASEDIR/rapid-expansion -I$BASEDIR/lib"
+
+$SCHEME $LIBRARY_PATHS $BASEDIR/bin/rapid-compiler.scm $*

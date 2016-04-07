@@ -1,0 +1,7 @@
+This repository contains a R7RS-compatible implementation of the Scheme
+programming language.
+
+Prerequisites
+-------------
+
+  - Chibi Scheme: https://github.com/ashinn/chibi-scheme
