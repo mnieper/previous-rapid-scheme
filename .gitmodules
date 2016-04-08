@@ -7,3 +7,12 @@
 [submodule "rapid-expansion"]
 	path = rapid-expansion
 	url = https://github.com/mnieper/rapid-expansion.git
+[submodule "scheme-reader"]
+	path = scheme-reader
+	url = git@github.com:mnieper/scheme-reader
+[submodule "scheme-lib"]
+	path = scheme-lib
+	url = git@github.com:mnieper/scheme-lib
+[submodule "scheme-expander"]
+	path = scheme-expander
+	url = git@github.com:mnieper/scheme-expander

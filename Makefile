@@ -1,10 +1,10 @@
 .SUFFIXES:
 
 SHELL = /bin/bash
-LIBRARY_PATHS = -Irapid-lib -Irapid-read -Irapid-expansion -Ilib
+LIBRARY_PATHS = -Ischeme-lib -Ischeme-reader -Ischeme-expander -Ilib
 SCHEME = chibi-scheme $(LIBRARY_PATHS)
 
-UNIT_TESTS = rapid-lib/tests.scm rapid-read/tests.scm rapid-expansion/tests.scm
+UNIT_TESTS = scheme-lib/tests.scm scheme-reader/tests.scm scheme-expander/tests.scm
 
 all:
 
