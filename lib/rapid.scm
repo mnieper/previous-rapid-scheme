@@ -63,29 +63,29 @@
 	 (lambda (fieldspec)
 	   (find-index (rtd-fieldspecs rtd) fieldspec))
 	 fieldspecs)))
-    (lambda (cont flag marks . args)
+    (lambda args
       (let ((fields (make-vector k (if #f #f))))
 	(for-each
 	 (lambda (arg index)
 	   (vector-set! fields index arg))
 	 args indexes)
-	(cont (make-record fields))))))
+	(make-record fields)))))
 
 (define (rtd-predicate rtd)
   (let ((pred (rtd-record? rtd)))
-    (lambda (cont flag marks obj)
-      (cont (pred obj)))))
+    (lambda (obj)
+      (pred obj))))
 
 (define (rtd-accessor rtd field) 
   (let*
       ((record-fields (rtd-record-fields rtd))
        (index (find-index (rtd-fieldspecs rtd) field)))
-    (lambda (cont flag marks record)
-      (cont (vector-ref (record-fields record) index)))))
+    (lambda (record)
+      (vector-ref (record-fields record) index))))
 
 (define (rtd-mutator rtd field)
   (let*
       ((record-fields (rtd-record-fields rtd))
        (index (find-index (rtd-fieldspecs rtd) field)))
-    (lambda (cont flag marks record value)
-      (cont (vector-set! (record-fields record) index value)))))
+    (lambda (record value)
+      (vector-set! (record-fields record) index value))))

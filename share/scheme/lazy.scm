@@ -52,3 +52,5 @@
   (set-car! (car old) (promise-done? new))
   (set-cdr! (car old) (promise-value new))
   (set-car! new (car old)))	
+
+(define-primitive promise? 'promise?) ; FIXME

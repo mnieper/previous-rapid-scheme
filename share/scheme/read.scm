@@ -15,4 +15,9 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-primitive read 'read)
+(define-primitive %read 'read)
+
+(define read
+  (case-lambda
+   (() (%read (current-input-port)))
+   ((port) (%read port))))

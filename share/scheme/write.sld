@@ -20,5 +20,6 @@
 	  write
 	  write-shared
 	  write-simple)
-  (import (rapid primitive))
+  (import (rapid primitive)
+	  (scheme base))
   (include "write.scm"))

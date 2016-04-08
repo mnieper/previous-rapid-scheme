@@ -15,7 +15,27 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-primitive display 'display)
-(define-primitive write 'write)
-(define-primitive write-shared 'write-shared)
-(define-primitive write-simple 'write-simple)
+(define-primitive %display 'display)
+(define-primitive %write 'write)
+(define-primitive %write-shared 'write-shared)
+(define-primitive %write-simple 'write-simple)
+
+(define display
+  (case-lambda
+   ((obj) (%display obj (current-output-port)))
+   ((obj port) (%display obj port))))
+
+(define write
+  (case-lambda
+   ((obj) (%write obj (current-output-port)))
+   ((obj port) (%write obj port))))
+
+(define write-shared
+  (case-lambda
+   ((obj) (%write-shared obj (current-output-port)))
+   ((obj port) (%write-shared obj port))))
+
+(define write-simple
+  (case-lambda
+   ((obj) (%write-simple obj (current-output-port)))
+   ((obj port) (%write-simple obj port))))

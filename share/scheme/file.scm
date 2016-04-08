@@ -23,5 +23,17 @@
 (define-primitive open-binary-output-file 'open-binary-output-file)
 (define-primitive open-input-file 'open-input-file)
 (define-primitive open-output-file 'open-output-file)
-(define-primitive with-input-from-file 'with-input-from-file)
-(define-primitive with-output-to-file 'with-output-to-file)
+
+(define (with-input-from-file string thunk)
+  (call-with-input-file
+      (lambda (port)
+	(parameterize
+	    ((current-input-port port))
+	  thunk))))
+
+(define (with-output-to-file string thunk)
+  (call-with-output-file
+      (lambda (port)
+	(parameterize
+	    ((current-output-port port))
+	  thunk))))

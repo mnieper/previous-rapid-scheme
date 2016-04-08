@@ -17,5 +17,6 @@
 
 (define-library (scheme read)
   (export read)
-  (import (rapid primitive))
+  (import (rapid primitive)
+	  (scheme base))
   (include "read.scm"))

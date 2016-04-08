@@ -26,5 +26,6 @@
 	  open-output-file
 	  with-input-from-file
 	  with-output-to-file)
-  (import (rapid primitive))
+  (import (rapid primitive)
+	  (scheme base))
   (include "file.scm"))

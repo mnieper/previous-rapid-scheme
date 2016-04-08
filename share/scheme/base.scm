@@ -54,7 +54,7 @@
 (define-primitive cdr 'cdr)
 (define-primitive ceiling 'ceiling)
 (define-primitive char->integer 'char->integer)
-(define-primitive char-ready? 'char-ready?)
+(define-primitive %char-ready? 'char-ready?)
 (define-primitive char<=? 'char<=?)
 (define-primitive char<? 'char<?)
 (define-primitive char=? 'char=?)
@@ -67,9 +67,9 @@
 (define-primitive complex? 'complex?)
 (define-primitive cond-expand 'cond-expand) ; FIXME
 (define-primitive cons 'cons)
-(define-primitive current-error-port 'current-error-port)
-(define-primitive current-input-port 'current-input-port)
-(define-primitive current-output-port 'current-output-port)
+(define-primitive %current-error-port 'current-error-port)
+(define-primitive %current-input-port 'current-input-port)
+(define-primitive %current-output-port 'current-output-port)
 (define-primitive denominator 'denominator)
 (define-primitive do 'do)
 (define-primitive dynamic-wind 'dynamic-wind)
@@ -95,7 +95,7 @@
 (define-primitive floor-quotient 'floor-quotient)
 (define-primitive floor-remainder 'floor-remainder)
 (define-primitive floor/ 'floor/)
-(define-primitive flush-output-port 'flush-output-port)
+(define-primitive %flush-output-port 'flush-output-port)
 (define-primitive for-each 'for-each)
 (define-primitive gcd 'gcd)
 (define-primitive get-output-bytevector 'get-output-bytevector)
@@ -130,7 +130,7 @@
 (define-primitive min 'min)
 (define-primitive modulo 'modulo)
 (define-primitive negative? 'negative?)
-(define-primitive newline 'newline)
+(define-primitive %newline 'newline)
 (define-primitive not 'not)
 (define-primitive null? 'null?)
 (define-primitive number->string 'number->string)
@@ -144,7 +144,7 @@
 (define-primitive output-port-open? 'output-port-open?)
 (define-primitive output-port? 'output-port?)
 (define-primitive pair? 'pair?)
-(define-primitive peek-char 'peek-char)
+(define-primitive %peek-char 'peek-char)
 (define-primitive peek-u8 'peek-u8)
 (define-primitive port? 'port?)
 (define-primitive positive? 'positive?)
@@ -154,13 +154,13 @@
 (define-primitive raise-continuable 'raise-continuable)
 (define-primitive rational? 'rational?)
 (define-primitive rationalize 'rationalize)
-(define-primitive read-bytevector 'read-bytevector)
-(define-primitive read-bytevector! 'read-bytevector!)
-(define-primitive read-char 'read-char)
+(define-primitive %read-bytevector 'read-bytevector)
+(define-primitive %read-bytevector! 'read-bytevector!)
+(define-primitive %read-char 'read-char)
 (define-primitive read-error? 'read-error?)
-(define-primitive read-line 'read-line)
-(define-primitive read-string 'read-string)
-(define-primitive read-u8 'read-u8)
+(define-primitive %read-line 'read-line)
+(define-primitive %read-string 'read-string)
+(define-primitive %read-u8 'read-u8)
 (define-primitive real? 'real?)
 (define-primitive remainder 'remainder)
 (define-primitive reverse 'reverse)
@@ -202,7 +202,7 @@
 (define-primitive truncate-quotient 'truncate-quotient)
 (define-primitive truncate-remainder 'truncate-remainder)
 (define-primitive truncate/ 'truncate/)
-(define-primitive u8-ready? 'u8-ready?)
+(define-primitive %u8-ready? 'u8-ready?)
 (define-primitive utf8->string 'utf8->string)
 (define-primitive values 'values)
 (define-primitive vector 'vector)
@@ -219,11 +219,13 @@
 (define-primitive vector-set! 'vector-set!)
 (define-primitive vector? 'vector?)
 (define-primitive with-exception-handler 'with-exception-handler)
-(define-primitive write-bytevector 'write-bytevector)
-(define-primitive write-char 'write-char)
-(define-primitive write-string 'write-string)
-(define-primitive write-u8 'write-u8)
+(define-primitive %write-bytevector 'write-bytevector)
+(define-primitive %write-char 'write-char)
+(define-primitive %write-string 'write-string)
+(define-primitive %write-u8 'write-u8)
 (define-primitive zero? 'zero?)
+
+(define-primitive with-parameter 'with-parameter)
 
 ;;; Procedures
 
@@ -623,3 +625,94 @@
 
 (define <param-set!> (vector #f))
 (define <param-convert> (vector #f))
+
+;;; Input and output
+
+(define current-input-port (make-parameter (%current-input-port)))
+(define current-output-port (make-parameter (%current-output-port)))
+(define current-error-port (make-parameter (%current-error-port)))
+
+;;; Input
+
+(define read-char
+  (case-lambda
+   (() (%read-char (current-input-port)))
+   ((port) (%read-char port))))
+
+(define peek-char
+  (case-lambda
+   (() (%peek-char (current-input-port)))
+   ((port) (%peek-char port))))
+
+(define read-line
+  (case-lambda
+   (() (%read-line (current-input-port)))
+   ((port) (%read-line port))))
+
+(define char-ready?
+  (case-lambda
+   (() (%char-ready? (current-input-port)))
+   ((port) (%char-ready? port))))
+
+(define read-string
+  (case-lambda
+   ((k) (%read-string k (current-input-port)))
+   ((k port) (%read-string k port))))
+
+(define read-u8
+  (case-lambda
+   (() (%read-u8 (current-input-port)))
+   ((port) (%read-u8 port))))
+
+(define u8-ready?
+  (case-lambda
+   (() (%u8-ready? (current-input-port)))
+   ((port) (%u8-ready? port))))
+
+(define read-bytevector
+  (case-lambda
+   ((k) (%read-bytevector (current-input-port)))
+   ((k port) (%read-bytevector k port))))
+
+(define read-bytevector!
+  (case-lambda
+   ((bytevector) (%read-bytevector! bytevector (current-input-port)))
+   ((bytevector port) (%read-bytevector! bytevector port))
+   ((bytevector port start) (%read-bytevector! bytevector port start))
+   ((bytevector port start end) (%read-bytevector! bytevector port start end))))
+
+;;; Output
+
+(define newline
+  (case-lambda
+   (() (%newline (current-output-port)))
+   ((port) (%newline port))))
+
+(define write-char
+  (case-lambda
+   ((char) (%write-char char (current-output-port)))
+   ((char port) (%write-char char port))))
+
+(define write-string
+  (case-lambda
+   ((string) (%write-string string (current-output-port)))
+   ((string port) (%write-string string port))
+   ((string port start) (%write-string port start))
+   ((string port start end) (%write-string port start end))))
+
+(define write-u8
+  (case-lambda
+   ((byte) (%write-u8 byte (current-output-port)))
+   ((byte port) (%write-u8 byte port))))
+
+(define write-bytevector
+  (case-lambda
+   ((bytevector) (%write-bytevector bytevector (current-output-port)))
+   ((bytevector port) (%write-bytevector bytevector port))
+   ((bytevector port start) (%write-bytevector port start))
+   ((bytevector port start end) (%write-bytevector port start end))))
+
+(define flush-output-port
+  (case-lambda
+   (() (%flush-output-port (current-output-port)))
+   ((port) (%flush-output-port port))))

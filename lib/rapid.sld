@@ -132,7 +132,6 @@
 	  list?
 	  make-bytevector
 	  make-list
-	  make-parameter
 	  make-string
 	  make-vector
 	  map
@@ -297,8 +296,6 @@
 	  open-binary-output-file
 	  open-input-file
 	  open-output-file
-	  with-input-from-file
-	  with-output-to-file
 
 	  acos
 	  asin
@@ -336,8 +333,8 @@
 
 	  null-environment
 	  scheme-report-environment)
-  (import (rapid primitive)
-	  (scheme base)
+  (import (scheme base)
+	  (scheme case-lambda)
 	  (scheme char)
 	  (scheme complex)
 	  (scheme cxr)
@@ -350,4 +347,5 @@
 	  (scheme repl)
 	  (scheme time)
 	  (scheme write)
-	  (scheme r5rs)))
+	  (scheme r5rs))
+  (include "rapid.scm"))

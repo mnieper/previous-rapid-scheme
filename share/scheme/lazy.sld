@@ -20,5 +20,8 @@
 	  delay-force
 	  force
 	  make-promise
-	  promise?))
+	  promise?)
+  (import (rapid primitive)
+          (scheme base))
+  (include "lazy.scm"))
 
