@@ -23,6 +23,13 @@
 	  set!
 	  define-values
 	  letrec*-values
+
+	  make-record-type
+	  make-type-predicate
+	  make-constructor
+	  make-getter
+	  make-setter
+
 	  make-rtd
 	  rtd-constructor
 	  rtd-predicate
