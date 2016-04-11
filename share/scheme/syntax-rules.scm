@@ -20,29 +20,16 @@
    (lambda (syntax rename compare)
      (define _er-macro-transformer (rename 'er-macro-transformer))
      (define _define-syntax (rename 'define-syntax))
-     (define _lambda (rename 'lambda))
      `(,_define-syntax
+       ,(cadr (syntax-datum syntax))
        (,_er-macro-transformer
-	(,_lambda
-	 (syntax rename compare)
-	 (compile-error (format "invalid use of auxiliary syntax ‘~a’"
-				(syntax->datum (car syntax) unclose-form))
-			syntax))))
-		  
-
-     
-     `(,(rename 'er-macro-transformer)
-
-       ))))
+	(lambda (syntax rename compare)
+	  (compile-error (format "invalid use of auxiliary syntax ‘~a’"
+				 (syntax->datum (car (syntax-datum syntax)) unclose-form))
+			 syntax)))))))
 
 (define-syntax ... (make-auxiliary-syntax))
-
-(define-syntax ...
-  (er-macro-transformer
-   (lambda (syntax rename compare)
-     (compile-error (format "invalid use of auxiliary syntax ‘~a’"
-			    (syntax->datum (car syntax) unclose-form))
-		    syntax))))
+(define-syntax _ (make-auxiliary-syntax))
 
 (define-syntax %syntax-rules ;; XXX
   (er-macro-transformer
@@ -83,7 +70,7 @@
 			 (lambda (form)
 			   (and (identifier? form)
 				(not (literal? form))			   
-				(compare ellipsis form #t)))
+				(compare ellipsis form #t)))  ;; this won't work!
 			 (lambda (form)
 			   (and (identifier? form)
 				(not (literal? form))
@@ -93,15 +80,6 @@
 	  
 
 	  
-				  
-	  ;; Wenn EEE angegeben ist, wird EEE während der Expansion gebunden.
-	  ;; Wie machen wir das?
-
-	  ;; (define-syntax a YYY)  <--- muß yyy als transformer expanden
-	                                 ; ... dazu erst macro expansion
-					; am Ende muß er-macro-expander da stehen
-	      ;; statisch: 
-	  ;; Wir können nicht (let ... ) daraus machen.
 	  
      )))
 ))
