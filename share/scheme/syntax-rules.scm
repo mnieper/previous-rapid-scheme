@@ -15,6 +15,35 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(define-syntax define-auxiliary-syntax
+  (er-macro-transformer
+   (lambda (syntax rename compare)
+     (define _er-macro-transformer (rename 'er-macro-transformer))
+     (define _define-syntax (rename 'define-syntax))
+     (define _lambda (rename 'lambda))
+     `(,_define-syntax
+       (,_er-macro-transformer
+	(,_lambda
+	 (syntax rename compare)
+	 (compile-error (format "invalid use of auxiliary syntax ‘~a’"
+				(syntax->datum (car syntax) unclose-form))
+			syntax))))
+		  
+
+     
+     `(,(rename 'er-macro-transformer)
+
+       ))))
+
+(define-syntax ... (make-auxiliary-syntax))
+
+(define-syntax ...
+  (er-macro-transformer
+   (lambda (syntax rename compare)
+     (compile-error (format "invalid use of auxiliary syntax ‘~a’"
+			    (syntax->datum (car syntax) unclose-form))
+		    syntax))))
+
 (define-syntax %syntax-rules ;; XXX
   (er-macro-transformer
    (lambda (syntax rename compare)
@@ -25,6 +54,7 @@
 				  (list (syntax-datum (list-ref transformer 1))))
 			     #f)
 			    ((and (>= (length transformer) 3)
+				  (identifier? (syntax-datum (list-ref transformer 1)))
 				  (list? (syntax-datum (list-ref transformer 2))))
 			     (list-ref transformer 1))
 			    (else
@@ -32,10 +62,47 @@
 	  (literal-syntax* (list-ref transformer (if ellipsis-syntax 2 1)))
 	  (syntax-rule-syntax* (list-tail transformer (if ellipsis-syntax 3 2)))
 	  (ellipsis (if ellipsis-syntax (syntax-datum ellipsis-syntax) #f))
+	  (identifier-comparator (make-comparator identifier? compare #f #f))
+	  (literal-set
+	   (let loop ((literal-set (make-set identifier-comparator))
+		      (literal-syntax* literal-syntax+))
+	     (if (null? literal-syntax*)
+		 literal-set
+		 (let*
+		     ((literal-syntax (car literal-syntax*))
+		      (literal (syntax-datum literal-syntax)))
+		   (assert-identifier! literal-syntax)
+		   (when (set-contains? literal-set literal)
+		     (compile-error (format "duplicate literal identifier ‘~a’"
+					    (syntax->datum literal-syntax unclose-form))
+				    literal-syntax))
+		   (loop (set-adjoin literal-set literal) (cdr literal-syntax*))))))
+	  (literal? (lambda (identifier)
+		      (set-contains? literal-set identifier)))
+	  (ellipsis? (if ellipsis
+			 (lambda (form)
+			   (and (identifier? form)
+				(not (literal? form))			   
+				(compare ellipsis form #t)))
+			 (lambda (form)
+			   (and (identifier? form)
+				(not (literal? form))
+				(compare (rename '...) form)))))
+	  (underscore? (lambda (identifier)
+			 (compare (rename '_) identifier)))
 	  
-	  
-	  (ellipsis-syntax (if (and (>= (leng
 
+	  
+				  
+	  ;; Wenn EEE angegeben ist, wird EEE während der Expansion gebunden.
+	  ;; Wie machen wir das?
+
+	  ;; (define-syntax a YYY)  <--- muß yyy als transformer expanden
+	                                 ; ... dazu erst macro expansion
+					; am Ende muß er-macro-expander da stehen
+	      ;; statisch: 
+	  ;; Wir können nicht (let ... ) daraus machen.
+	  
      )))
-
-  
+))
+ 
