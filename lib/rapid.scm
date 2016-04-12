@@ -30,42 +30,6 @@
 
 ;; Procedural records
 
-(define-record-type <record-type>
-  (%make-record-type field-count make-record record? record-fields)
-  record-type?
-  (field-count record-type-field-count)
-  (make-record record-type-make-record)
-  (record? record-type-record?)
-  (record-fields record-type-record-fields))
-
-(define (make-record-type field-count)
-  (define-record-type <record>
-    (make-record fields)
-    record?
-    (fields record-fields))
-  (%make-record-type field-count make-record record? record-fields))
-
-(define (make-type-predicate record-type)
-  (record-type-record? record-type))
-
-(define (make-constructor record-type)
-  (let ((make-record (record-type-make-record record-type))
-	(field-count (record-type-field-count record-type)))
-    (lambda ()
-      (make-record (make-vector field-count (if #f #f))))))
-
-(define (make-getter record-type index)
-  (let ((record-fields (record-type-record-fields record-type)))
-    (lambda (record)
-      (vector-ref (record-fields record) index))))
-
-(define (make-setter record-type index)
-  (let ((record-fields (record-type-record-fields record-type)))
-    (lambda (record value)
-      (vector-set! (record-fields record) index value))))
-
-;; XXX: Old interface
-
 (define-record-type <rtd>
   (%make-rtd name fieldspecs make-record record? record-fields)
   rtd?
