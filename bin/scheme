@@ -1,0 +1,12 @@
+#!/bin/sh
+
+SCHEME=chibi-scheme
+BASEDIR=$(dirname $0)/..
+COMPILE=$BASEDIR/bin/rapid-scheme
+OUTPUT=$(dirname "$1")/$(basename "$1" .scm).bin
+
+$COMPILE -Ishare -Ischeme-lib $1 > $OUTPUT
+
+shift
+
+$SCHEME -I$BASEDIR/lib -- $OUTPUT $*
