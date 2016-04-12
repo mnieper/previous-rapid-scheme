@@ -225,12 +225,6 @@
 (define-primitive %write-u8 'write-u8)
 (define-primitive zero? 'zero?)
 
-(define-primitive make-record-type 'make-record-type)
-(define-primitive make-type-predicate 'make-type-predicate)
-(define-primitive make-constructor 'make-constructor)
-(define-primitive make-getter 'make-getter)
-(define-primitive make-setter 'make-setter)
-
 (define-primitive make-rtd 'make-rtd)
 (define-primitive rtd-constructor 'rtd-constructor)
 (define-primitive rtd-predicate 'rtd-predicate)
