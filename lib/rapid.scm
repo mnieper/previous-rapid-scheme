@@ -76,36 +76,43 @@
   (record-fields rtd-record-fields))
 
 (define (find-index fieldspecs field)
-  (let loop ((fieldspecs fieldspecs) (i 0))
-    (if (eq? (car fieldspecs) field)
-	i
-	(loop (cdr fieldspecs) (+ i 1)))))
+  (let loop ((i 0))
+    (cond
+     ((= i (vector-length fieldspecs))
+      (error "invalid field" field))
+     ((eq? (vector-ref fieldspecs i) field)
+      i)
+     (else
+      (loop (+ i 1))))))
 
-(define (make-rtd name . fieldspecs) ;; XXX Not the SRFI 99-convention
+(define (make-rtd name fieldspecs)
   (define-record-type <record>
     (make-record fields)
     record?
     (fields record-fields))
   (%make-rtd name fieldspecs make-record record? record-fields))
 
-(define (rtd-constructor rtd . fieldspecs)
+(define (rtd-constructor rtd fieldspecs)
   (let*
       ((make-record
 	(rtd-make-record rtd))
        (k
-	(length (rtd-fieldspecs rtd)))
+	(vector-length (rtd-fieldspecs rtd)))
        (indexes
-	(map
+	(vector-map
 	 (lambda (fieldspec)
 	   (find-index (rtd-fieldspecs rtd) fieldspec))
 	 fieldspecs)))
     (lambda args
-      (let ((fields (make-vector k (if #f #f))))
-	(for-each
-	 (lambda (arg index)
-	   (vector-set! fields index arg))
-	 args indexes)
-	(make-record fields)))))
+      (let ((arg-vector (list->vector args)))
+	(unless (= (vector-length arg-vector) (vector-length indexes))
+	  (error "unexpected number of arguments" (vector-length args)))
+	(let ((fields (make-vector k (if #f #f))))
+	  (vector-for-each
+	   (lambda (arg index)
+	     (vector-set! fields index arg))
+	   arg-vector indexes)
+	  (make-record fields))))))
 
 (define (rtd-predicate rtd)
   (let ((pred (rtd-record? rtd)))

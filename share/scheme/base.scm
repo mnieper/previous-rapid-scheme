@@ -231,9 +231,47 @@
 (define-primitive make-getter 'make-getter)
 (define-primitive make-setter 'make-setter)
 
+(define-primitive make-rtd 'make-rtd)
+(define-primitive rtd-constructor 'rtd-constructor)
+(define-primitive rtd-predicate 'rtd-predicate)
+(define-primitive rtd-accessor 'rtd-accessor)
+(define-primitive rtd-mutator 'rtd-mutator)
+
 ;;; Record types
 
 (define-syntax define-record-type
+  (syntax-rules ()
+    ((define-record-type name
+       (constructor-name constructor-field-name ...)
+       pred
+       (field-name accessor mutator ...) ...)
+     (begin
+       (define name (make-rtd 'name #(field-name ...)))
+       (define constructor-name (rtd-constructor name #(constructor-field-name ...)))
+       (define pred (rtd-predicate name))
+       (define-record-type-aux name () (field-name accessor mutator ...) ...)))
+    ((define-record-type . _)
+     (syntax-error "bad define-record-type syntax"))))
+
+(define-syntax define-record-type-aux
+  (syntax-rules ()
+    ((define-record-type-aux name ((identifier value) ...))
+     (define-values (identifier ...) (values value ...)))
+    ((define-record-type-aux name (definition ...) (field-name accessor) . rest)
+     (define-record-type-aux name
+       (definition ...
+	 (accessor (rtd-accessor name 'field-name)))
+       . rest))
+    ((define-record-type-aux name (definition ...) (field-name accessor mutator) . rest)
+     (define-record-type-aux name
+       (definition ...
+	 (accessor (rtd-accessor name 'field-name))
+	 (mutator (rtd-mutator name 'field-name)))
+       . rest))
+    ((define-record-type-aux name (definition ...) field . rest)
+     (syntax-error "bad record field specifier" field))))
+
+(define-syntax %define-record-type
   (er-macro-transformer
    (lambda (syntax rename compare)
      (define _begin (rename 'begin))
